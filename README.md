@@ -1,1 +1,1 @@
-# microservices-resilency-experiments
+# Microservices fault tolerance experiments
