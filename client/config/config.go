@@ -9,7 +9,7 @@ import (
 type Config struct {
 	FinalServerUrl     string `env:"FINAL_SERVER_URL" envDefault:"http://localhost:3002/experiment" validate:"url"`
 	ConcurrentRequests int    `env:"CONCURRENT_REQUESTS" envDefault:"100" validate:"numeric"`
-	RequestBatch       int    `env:"CONCURRENT_REQUESTS" envDefault:"100" validate:"numeric"`
+	RequestBatch       int    `env:"REQUEST_BATCH" envDefault:"100" validate:"numeric"`
 }
 
 var globalConf *Config
