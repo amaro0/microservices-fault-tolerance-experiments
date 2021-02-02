@@ -3,6 +3,7 @@ package main
 import (
 	"amaro0/github.com/microservices-fault-tolerance-experiments/finalserver/config"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 func main() {
@@ -17,6 +18,8 @@ func main() {
 	})
 
 	r.GET("/experiment", func(c *gin.Context) {
+		time.Sleep(500 * time.Millisecond)
+
 		c.Status(204)
 	})
 
