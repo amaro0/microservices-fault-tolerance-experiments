@@ -7,21 +7,31 @@ import (
 )
 
 type Config struct {
-	Port    string `env:"PORT" envDefault:"3002" validate:"hostname_port"`
-	GinMode string `'env:"GIN_MODE' envDefault:"debug" validate:"oneof="debug release"`
+	Port    string `env:"PORT" envDefault:"3002" validate:"numeric"`
+	GinMode string `env:"GIN_MODE envDefault:"debug" validate:"oneof="debug release"`
 }
 
-func NewConfig() *Config {
-	c := Config{}
+var globalConf *Config
 
-	if err := env.Parse(&c); err != nil {
+func newConfig() *Config {
+	globalConf = &Config{}
+
+	if err := env.Parse(globalConf); err != nil {
 		log.Fatal("Env parse error! ", err)
 	}
 
 	validate := validator.New()
-	if err := validate.Struct(c); err != nil {
+	if err := validate.Struct(globalConf); err != nil {
 		log.Fatal("Env validation error! ", err.Error())
 	}
 
-	return &c
+	return globalConf
+}
+
+func GetConfig() *Config {
+	if globalConf == nil {
+		return newConfig()
+	}
+
+	return globalConf
 }

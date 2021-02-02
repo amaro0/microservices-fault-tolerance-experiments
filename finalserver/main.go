@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	conf := config.NewConfig()
-	println(conf)
+	conf := config.GetConfig()
+
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
