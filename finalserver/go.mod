@@ -1,4 +1,4 @@
-module amaro0/github.com/microservices-fault-tolerance-experiments/finalserver
+module github.com/amaro0/microservices-fault-tolerance-experiments/finalserver
 
 go 1.15
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"amaro0/github.com/microservices-fault-tolerance-experiments/finalserver/config"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/finalserver/config"
 	"github.com/gin-gonic/gin"
 	"time"
 )
