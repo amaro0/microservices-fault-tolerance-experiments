@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	conf := config.GetConfig()
+	serverConfig := config.GetServerConfig()
 
 	r := gin.Default()
 
@@ -23,5 +23,5 @@ func main() {
 		c.Status(204)
 	})
 
-	r.Run(":" + conf.Port)
+	r.Run(":" + serverConfig.Port)
 }

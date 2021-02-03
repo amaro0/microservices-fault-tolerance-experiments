@@ -1,37 +1,27 @@
 package config
 
 import (
-	"github.com/caarlos0/env/v6"
-	"github.com/go-playground/validator/v10"
+	"github.com/amaro0/envloader"
 	"log"
 )
 
-type Config struct {
+type serverConfig struct {
 	Port    string `env:"PORT" envDefault:"3002" validate:"numeric"`
 	GinMode string `env:"GIN_MODE envDefault:"debug" validate:"oneof="debug release"`
 }
 
-var globalConf *Config
+var serverConfigInstance *serverConfig
 
-func newConfig() *Config {
-	globalConf = &Config{}
+func GetServerConfig() *serverConfig {
+	if serverConfigInstance == nil {
+		err, conf := envloader.Load(serverConfig{})
 
-	if err := env.Parse(globalConf); err != nil {
-		log.Fatal("Env parse error! ", err)
+		if err != nil {
+			log.Fatal()
+		}
+
+		serverConfigInstance = conf.(*serverConfig)
 	}
 
-	validate := validator.New()
-	if err := validate.Struct(globalConf); err != nil {
-		log.Fatal("Env validation error! ", err.Error())
-	}
-
-	return globalConf
-}
-
-func GetConfig() *Config {
-	if globalConf == nil {
-		return newConfig()
-	}
-
-	return globalConf
+	return serverConfigInstance
 }
