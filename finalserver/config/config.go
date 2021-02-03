@@ -17,7 +17,7 @@ func GetServerConfig() *serverConfig {
 		err, conf := envloader.Load(serverConfig{})
 
 		if err != nil {
-			log.Fatal()
+			log.Fatal("Server config loading failed")
 		}
 
 		serverConfigInstance = conf.(*serverConfig)

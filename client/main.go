@@ -6,10 +6,10 @@ import (
 	"net/http"
 )
 
-var conf *config.Config
+var conf *config.ExperimentConfig
 
 func main() {
-	conf = config.GetConfig()
+	conf = config.GetExperimentConfig()
 
 	done := make(chan bool, conf.ConcurrentRequests)
 
