@@ -7,7 +7,7 @@ import (
 )
 
 type Experiment struct {
-	StringToHash string `json:"stringToHash" binding:"required"`
+	StringToHash string `form:"stringToHash" json:"stringToHash" binding:"required"`
 }
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 
 	r.GET("/experiment", func(c *gin.Context) {
 		var query Experiment
-		if err := c.ShouldBindJSON(&query); err != nil {
+		if err := c.Bind(&query); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
@@ -45,7 +45,7 @@ func main() {
 }
 
 func hash(s string) (hashed string, e error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(s), 15)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(s), 9)
 
 	if err != nil {
 		return s, err
