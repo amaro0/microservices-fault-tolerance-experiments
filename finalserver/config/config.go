@@ -6,7 +6,7 @@ import (
 )
 
 type serverConfig struct {
-	Port    string `env:"PORT" envDefault:"3002" validate:"numeric"`
+	Port    string `env:"PORT" envDefault:"3000" validate:"numeric"`
 	GinMode string `env:"GIN_MODE envDefault:"debug" validate:"oneof="debug release"`
 }
 

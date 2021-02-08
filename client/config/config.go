@@ -6,7 +6,7 @@ import (
 )
 
 type ExperimentConfig struct {
-	FinalServerUrl     string `env:"FINAL_SERVER_URL" envDefault:"http://localhost:3002/experiment" validate:"url"`
+	ProxyServerUrl     string `env:"FINAL_SERVER_URL" envDefault:"http://localhost:4000/proxy" validate:"url"`
 	ConcurrentRequests int    `env:"CONCURRENT_REQUESTS" envDefault:"100" validate:"numeric"`
 	RequestBatch       int    `env:"REQUEST_BATCH" envDefault:"100" validate:"numeric"`
 }

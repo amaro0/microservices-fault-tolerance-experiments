@@ -22,7 +22,7 @@ func main() {
 
 func requestContinuously(done chan bool) {
 	for i := 0; i <= conf.RequestBatch; i++ {
-		resp, err := http.Get(conf.FinalServerUrl)
+		resp, err := http.Get(conf.ProxyServerUrl)
 
 		if err != nil {
 			log.Println("Request error! ", err.Error())
