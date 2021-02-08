@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/client/config"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -23,16 +24,19 @@ func main() {
 func requestContinuously(done chan bool) {
 	for i := 0; i <= conf.RequestBatch; i++ {
 		resp, err := http.Get(conf.ProxyServerUrl)
+		defer resp.Body.Close()
 
 		if err != nil {
 			log.Println("Request error! ", err.Error())
 		}
 
-		err = resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
 
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Println("Body parsing error! ", err.Error())
 		}
+
+		log.Print(string(body))
 	}
 
 	done <- true
