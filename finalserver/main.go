@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/finalserver/config"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Experiment struct {
@@ -28,7 +27,7 @@ func main() {
 			return
 		}
 
-		hashed, err := hash(query.StringToHash)
+		hashed, err := RunExperiment(query)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
@@ -42,14 +41,4 @@ func main() {
 	})
 
 	r.Run(":" + serverConfig.Port)
-}
-
-func hash(s string) (hashed string, e error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(s), 9)
-
-	if err != nil {
-		return s, err
-	}
-
-	return string(bytes), nil
 }
