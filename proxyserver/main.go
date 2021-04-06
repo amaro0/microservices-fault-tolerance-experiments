@@ -20,6 +20,10 @@ type FinalServerResult struct {
 	Hashed string `json:"hashed"`
 }
 
+type ProxyQuery struct {
+	RequestId string `form:"requestId" json:"requestId" binding:"required"`
+}
+
 func main() {
 	serverConfig := config.GetServerConfig()
 
@@ -33,7 +37,13 @@ func main() {
 
 	r.GET("/proxy", func(c *gin.Context) {
 		time.Sleep(300 * time.Millisecond)
-		url, err := createExperimentUrl(serverConfig)
+		var query ProxyQuery
+		if err := c.Bind(&query); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		url, err := createExperimentUrl(serverConfig, query)
 		if err != nil {
 			c.JSON(500, gin.H{
 				"error": err.Error(),
@@ -70,7 +80,7 @@ func main() {
 	r.Run(":" + serverConfig.Port)
 }
 
-func createExperimentUrl(serverConfig *config.ServerConfig) (url.URL, error) {
+func createExperimentUrl(serverConfig *config.ServerConfig, proxyQuery ProxyQuery) (url.URL, error) {
 	base, err := url.Parse(serverConfig.FinalServerUrl)
 	if err != nil {
 		return *base, err
@@ -78,6 +88,7 @@ func createExperimentUrl(serverConfig *config.ServerConfig) (url.URL, error) {
 
 	query := url.Values{}
 	query.Add("stringToHash", uuid.NewString())
+	query.Add("requestId", proxyQuery.RequestId)
 	base.RawQuery = query.Encode()
 
 	return *base, nil

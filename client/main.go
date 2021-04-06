@@ -2,9 +2,11 @@ package main
 
 import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/client/config"
+	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 var conf *config.ExperimentConfig
@@ -23,7 +25,16 @@ func main() {
 
 func requestContinuously(done chan bool) {
 	for i := 0; i <= conf.RequestBatch; i++ {
-		resp, err := http.Get(conf.ProxyServerUrl)
+		base, err := url.Parse(conf.ProxyServerUrl)
+		if err != nil {
+			log.Println("Url parsing error")
+		}
+
+		query := url.Values{}
+		query.Add("requestId", uuid.NewString())
+		base.RawQuery = query.Encode()
+
+		resp, err := http.Get(base.String())
 		defer resp.Body.Close()
 
 		if err != nil {

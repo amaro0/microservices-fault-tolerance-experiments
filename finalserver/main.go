@@ -15,9 +15,10 @@ var (
 
 type Experiment struct {
 	StringToHash     string `form:"stringToHash" json:"stringToHash" binding:"required"`
-	ErrorRatio       int    `json:"errorRatio"`
-	ErrorType        string `json:"errorType" validate:"oneof=timeout"'`
-	TimeoutLengthInS int    `json:"timeoutLengthInS"`
+	RequestId        string `form:"requestId" json:"requestId" binding:"required"`
+	ErrorRatio       int    `json:"errorRatio" json:"errorRatio"`
+	ErrorType        string `json:"errorType" json:"errorType" validate:"oneof=timeout"'`
+	TimeoutLengthInS int    `json:"timeoutLengthInS" json:"timeoutLengthInS"`
 }
 
 func main() {
