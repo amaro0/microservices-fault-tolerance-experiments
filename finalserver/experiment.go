@@ -1,12 +1,20 @@
 package main
 
-import "golang.org/x/crypto/bcrypt"
-
-func NewExperiment() {
-
-}
+import (
+	"golang.org/x/crypto/bcrypt"
+	"math/rand"
+	"time"
+)
 
 func RunExperiment(e Experiment) (string, error) {
+	if e.ErrorType == ExperimentErrors.TimeoutError {
+		if e.ErrorRatio != 0 && rand.Intn(100) <= e.ErrorRatio {
+			time.Sleep(time.Duration(e.TimeoutLengthInS) * time.Second)
+		}
+
+		return hash(e.StringToHash)
+	}
+
 	return hash(e.StringToHash)
 }
 

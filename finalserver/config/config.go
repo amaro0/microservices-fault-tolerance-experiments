@@ -5,23 +5,22 @@ import (
 	"log"
 )
 
-type serverConfig struct {
-	Port     string `env:"PORT" envDefault:"3000" validate:"numeric"`
-	GinMode  string `env:"GIN_MODE" envDefault:"debug" validate:"oneof=debug release"`
-	FailMode string `env:"FILE_MODE" envDefault:"none" validate:"oneof=none timeout"`
+type ServerConfig struct {
+	Port    string `env:"PORT" envDefault:"3000" validate:"numeric"`
+	GinMode string `env:"GIN_MODE" envDefault:"debug" validate:"oneof=debug release"`
 }
 
-var serverConfigInstance *serverConfig
+var serverConfigInstance *ServerConfig
 
-func GetServerConfig() *serverConfig {
+func GetServerConfig() *ServerConfig {
 	if serverConfigInstance == nil {
-		err, conf := envloader.Load(serverConfig{})
+		err, conf := envloader.Load(ServerConfig{})
 
 		if err != nil {
 			log.Fatal("Server config loading failed")
 		}
 
-		serverConfigInstance = conf.(*serverConfig)
+		serverConfigInstance = conf.(*ServerConfig)
 	}
 
 	return serverConfigInstance

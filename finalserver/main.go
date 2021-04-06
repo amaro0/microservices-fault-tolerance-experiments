@@ -5,8 +5,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	ExperimentErrors = struct {
+		TimeoutError string
+	}{
+		TimeoutError: "timeout",
+	}
+)
+
 type Experiment struct {
-	StringToHash string `form:"stringToHash" json:"stringToHash" binding:"required"`
+	StringToHash     string `form:"stringToHash" json:"stringToHash" binding:"required"`
+	ErrorRatio       int    `json:"errorRatio"`
+	ErrorType        string `json:"errorType" validate:"oneof=timeout"'`
+	TimeoutLengthInS int    `json:"timeoutLengthInS"`
 }
 
 func main() {
@@ -21,7 +32,8 @@ func main() {
 	})
 
 	r.GET("/experiment", func(c *gin.Context) {
-		var query Experiment
+		query := Experiment{ErrorRatio: 50, ErrorType: "timeout", TimeoutLengthInS: 30}
+
 		if err := c.Bind(&query); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
