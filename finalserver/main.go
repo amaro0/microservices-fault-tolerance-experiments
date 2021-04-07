@@ -16,7 +16,7 @@ var (
 type Experiment struct {
 	StringToHash     string `form:"stringToHash" json:"stringToHash" binding:"required"`
 	RequestId        string `form:"requestId" json:"requestId" binding:"required"`
-	ErrorRatio       int    `json:"errorRatio" json:"errorRatio"`
+	ErrorRatio       int    `json:"errorRatio" json:"errorRatio" validate:"min=0,max=100"`
 	ErrorType        string `json:"errorType" json:"errorType" validate:"oneof=timeout"'`
 	TimeoutLengthInS int    `json:"timeoutLengthInS" json:"timeoutLengthInS"`
 }

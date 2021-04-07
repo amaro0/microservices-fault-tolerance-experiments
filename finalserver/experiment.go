@@ -1,21 +1,30 @@
 package main
 
 import (
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"time"
 )
 
 func RunExperiment(e Experiment) (string, error) {
-	if e.ErrorType == ExperimentErrors.TimeoutError {
-		if e.ErrorRatio != 0 && rand.Intn(100) <= e.ErrorRatio {
-			time.Sleep(time.Duration(e.TimeoutLengthInS) * time.Second)
-		}
-
+	if e.ErrorRatio == 0 || rand.Intn(100) >= e.ErrorRatio {
 		return hash(e.StringToHash)
 	}
 
+	if e.ErrorType == ExperimentErrors.TimeoutError {
+		timeoutErr := timeout(e)
+
+		return "", timeoutErr
+	}
+
 	return hash(e.StringToHash)
+}
+
+func timeout(e Experiment) error {
+	time.Sleep(time.Duration(e.TimeoutLengthInS) * time.Second)
+
+	return errors.New("timeout: experiment successful timeout")
 }
 
 func hash(s string) (hashed string, e error) {
