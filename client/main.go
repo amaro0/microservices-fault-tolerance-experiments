@@ -7,48 +7,84 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 var conf *config.ExperimentConfig
 
+// THIS should be rewritten to use two separate gorouteies requester and resolver
+// requester will issue requests in constant rate of X per second
+// resolver will handle results at constant rate
 func main() {
 	conf = config.GetExperimentConfig()
 
-	done := make(chan bool, conf.ConcurrentRequests)
+	tickerDone := make(chan bool)
+	allRequestsDone := make(chan bool, conf.RequestBatch)
+	end := make(chan bool)
+	// ticks at Rate per s
+	ticker := time.NewTicker(time.Duration(1000/conf.Rate) * time.Millisecond)
 
-	for i := 0; i <= conf.ConcurrentRequests; i++ {
-		go requestContinuously(done)
-	}
+	var i int
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				go request(allRequestsDone)
+				i++
+				if i == conf.RequestBatch {
+					tickerDone <- true
+				}
+			case <-tickerDone:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+	log.Println("BEFORE END")
+	var endCounter int
+	go func() {
+		for {
+			select {
+			case <-allRequestsDone:
+				endCounter++
+				if endCounter == conf.RequestBatch {
+					end <- true
+					return
+				}
+			}
+		}
+	}()
 
-	<-done
+	<-end
+	log.Println("END")
 }
 
-func requestContinuously(done chan bool) {
-	for i := 0; i <= conf.RequestBatch; i++ {
-		base, err := url.Parse(conf.ProxyServerUrl)
-		if err != nil {
-			log.Println("Url parsing error")
-		}
-
-		query := url.Values{}
-		query.Add("requestId", uuid.NewString())
-		base.RawQuery = query.Encode()
-
-		resp, err := http.Get(base.String())
-		defer resp.Body.Close()
-
-		if err != nil {
-			log.Println("Request error! ", err.Error())
-		}
-
-		body, err := ioutil.ReadAll(resp.Body)
-
-		if err != nil {
-			log.Println("Body parsing error! ", err.Error())
-		}
-
-		log.Print(string(body))
+func request(done chan bool) {
+	base, err := url.Parse(conf.ProxyServerUrl)
+	if err != nil {
+		log.Println("Url parsing error")
+		return
 	}
+
+	query := url.Values{}
+	query.Add("requestId", uuid.NewString())
+	base.RawQuery = query.Encode()
+
+	resp, err := http.Get(base.String())
+
+	if err != nil {
+		log.Println("Request error! ", err.Error())
+		return
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.Println("Body parsing error! ", err.Error())
+	}
+
+	log.Print(string(body))
 
 	done <- true
 }
