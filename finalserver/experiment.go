@@ -12,10 +12,16 @@ func RunExperiment(e Experiment) (string, error) {
 		return hash(e.StringToHash)
 	}
 
-	if e.ErrorType == ExperimentErrors.TimeoutError {
+	if e.ErrorType == TimeoutError {
 		timeoutErr := timeout(e)
 
 		return "", timeoutErr
+	}
+
+	if e.ErrorType == UnhandledError {
+		hash(e.StringToHash)
+
+		return "", errors.New("unhandled error: experiment successful unhandled error")
 	}
 
 	return hash(e.StringToHash)
