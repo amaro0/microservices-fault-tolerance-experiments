@@ -34,7 +34,7 @@ func timeout(e Experiment) error {
 }
 
 func hash(s string) (hashed string, e error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(s), 9)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(s), 10)
 
 	if err != nil {
 		return s, err

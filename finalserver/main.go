@@ -70,7 +70,7 @@ func main() {
 }
 
 func failServerIfRequired(serverConfig config.ServerConfig) {
-	if serverConfig.ShouldPodFail {
+	if serverConfig.ShouldServerFail {
 		go func() {
 			time.Sleep(30 * time.Second)
 			log.Println("SERVER FAIL SIMULATION")

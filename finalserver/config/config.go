@@ -6,9 +6,10 @@ import (
 )
 
 type ServerConfig struct {
-	Port          string `env:"PORT" envDefault:"3000" validate:"numeric"`
-	GinMode       string `env:"GIN_MODE" envDefault:"debug" validate:"oneof=debug release"`
-	ShouldPodFail bool   `env:"SHOULD_POD_FAIL" envDefault:"false"`
+	Port                  string `env:"PORT" envDefault:"3000" validate:"numeric"`
+	GinMode               string `env:"GIN_MODE" envDefault:"debug" validate:"oneof=debug release"`
+	ShouldServerFail      bool   `env:"SHOULD_SERVER_FAIL" envDefault:"false"`
+	ShouldServerFailAfter int    `env:"SHOULD_SERVER_FAIL_AFTER" envDefault:"5"`
 }
 
 var serverConfigInstance *ServerConfig
