@@ -16,3 +16,6 @@
 .idea
 
 note.md
+
+# infra
+.terraform
