@@ -36,12 +36,12 @@ func main() {
 	})
 
 	r.GET("/proxy", func(c *gin.Context) {
-		time.Sleep(300 * time.Millisecond)
 		var query ProxyQuery
 		if err := c.Bind(&query); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
+		time.Sleep(300 * time.Millisecond)
 
 		url, err := createExperimentUrl(serverConfig, query)
 		if err != nil {
@@ -52,14 +52,14 @@ func main() {
 		}
 
 		resp, err := http.Get(url.String())
-		defer resp.Body.Close()
-
 		if err != nil {
-			c.JSON(500, gin.H{
+			log.Println("Request error! ", err.Error())
+			c.JSON(502, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
+		defer resp.Body.Close()
 
 		result := Result{}
 		json.NewDecoder(resp.Body).Decode(&result)
