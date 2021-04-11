@@ -74,6 +74,7 @@ func request(done chan bool) {
 
 	if err != nil {
 		log.Println("Request error! ", err.Error())
+		done <- true
 		return
 	}
 
@@ -82,6 +83,8 @@ func request(done chan bool) {
 
 	if err != nil {
 		log.Println("Body parsing error! ", err.Error())
+		done <- true
+		return
 	}
 
 	log.Print(string(body))
