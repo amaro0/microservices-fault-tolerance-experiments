@@ -3,6 +3,9 @@ package main
 import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/finalserver/config"
 	"github.com/gin-gonic/gin"
+	"log"
+	"os"
+	"time"
 )
 
 //var (
@@ -31,6 +34,8 @@ type Experiment struct {
 
 func main() {
 	serverConfig := config.GetServerConfig()
+
+	failServerIfRequired(*serverConfig)
 
 	r := gin.Default()
 
@@ -62,4 +67,14 @@ func main() {
 	})
 
 	r.Run(":" + serverConfig.Port)
+}
+
+func failServerIfRequired(serverConfig config.ServerConfig) {
+	if serverConfig.ShouldPodFail {
+		go func() {
+			time.Sleep(30 * time.Second)
+			log.Println("SERVER FAIL SIMULATION")
+			os.Exit(1)
+		}()
+	}
 }

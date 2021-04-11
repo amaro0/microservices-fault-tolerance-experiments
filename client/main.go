@@ -40,7 +40,7 @@ func main() {
 			}
 		}
 	}()
-	log.Println("BEFORE END")
+
 	var endCounter int
 	go func() {
 		for {
