@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/amaro0/micoservices-fault-tolerance-experiments/metrics/data"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics/data"
 	"log"
 	"net/http"
 )

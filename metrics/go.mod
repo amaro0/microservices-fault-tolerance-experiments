@@ -1,4 +1,4 @@
-module github.com/amaro0/micoservices-fault-tolerance-experiments/metrics
+module github.com/amaro0/microservices-fault-tolerance-experiments/metrics
 
 go 1.15
 

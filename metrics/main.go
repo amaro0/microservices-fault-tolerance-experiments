@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/amaro0/micoservices-fault-tolerance-experiments/metrics/data"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics/data"
 	"github.com/gin-gonic/gin"
 	"os"
 )
