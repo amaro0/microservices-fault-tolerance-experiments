@@ -2,18 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/amaro0/micoservices-fault-tolerance-experiments/metrics/data"
 	"github.com/gin-gonic/gin"
 	"os"
 )
-
-type MetricsData struct {
-	Server      string `json:"server" binding:"required"`
-	RequestId   string `json:"requestId" binding:"required"`
-	WasError    string `json:"wasError" binding:"required"`
-	ErrorTime   int    `json:"errorTime" validate:"min=0"`
-	SuccessTime int    `json:"successTime" validate:"min=0"`
-	ErrorType   string `json:"errorType"`
-}
 
 func main() {
 	r := gin.Default()
@@ -25,7 +17,7 @@ func main() {
 	})
 
 	r.POST("/metrics", func(c *gin.Context) {
-		data := MetricsData{}
+		data := data.Metrics{}
 
 		if err := c.BindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
