@@ -1,4 +1,4 @@
-package data
+package metrics
 
 type ServerType string
 
@@ -8,11 +8,11 @@ const (
 	ClientServer ServerType = "client"
 )
 
-type Metrics struct {
+type Model struct {
 	Server      ServerType `json:"server" binding:"required"`
 	RequestId   string     `json:"requestId" binding:"required"`
-	WasError    string     `json:"wasError" binding:"required"`
-	ErrorTime   int        `json:"errorTime" validate:"min=0"`
-	SuccessTime int        `json:"successTime" validate:"min=0"`
+	WasError    bool       `json:"wasError"`
+	ErrorTime   int        `json:"errorTime"`
+	SuccessTime int        `json:"successTime"`
 	ErrorType   string     `json:"errorType"`
 }

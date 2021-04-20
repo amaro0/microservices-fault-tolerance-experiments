@@ -6,9 +6,10 @@ import (
 )
 
 type ServerConfig struct {
-	Port           string `env:"PORT" envDefault:"4000" validate:"numeric"`
-	GinMode        string `env:"GIN_MODE envDefault:"debug" validate:"oneof="debug release"`
-	FinalServerUrl string `env:"FINAL_SERVER_URL" envDefault:"http://localhost:3000/experiment" validate:"url"`
+	Port             string `env:"PORT" envDefault:"4000" validate:"numeric"`
+	GinMode          string `env:"GIN_MODE envDefault:"debug" validate:"oneof="debug release"`
+	FinalServerUrl   string `env:"FINAL_SERVER_URL" envDefault:"http://localhost:3000/experiment" validate:"url"`
+	MetricsServerUrl string `env:"METRICS_SERVER_URL" envDefault:"http://localhost:2000" validate:"url"`
 }
 
 var serverConfigInstance *ServerConfig

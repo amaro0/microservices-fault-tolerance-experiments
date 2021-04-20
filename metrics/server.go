@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"fmt"
-	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics/data"
 	"github.com/gin-gonic/gin"
 	"os"
 )
@@ -17,9 +16,9 @@ func RunServer() {
 	})
 
 	r.POST("/metrics", func(c *gin.Context) {
-		data := data.Metrics{}
+		var data Model
 
-		if err := c.BindJSON(&data); err != nil {
+		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}

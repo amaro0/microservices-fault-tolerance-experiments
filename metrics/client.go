@@ -3,26 +3,36 @@ package metrics
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics/data"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-type Client struct {
+type client struct {
 	url string
 }
 
-func NewClient(url string) *Client {
-	return &Client{url}
+func NewClient(url string) *client {
+	return &client{url}
 }
 
-func (c *Client) Request(metrics data.Metrics) {
+func (c *client) SendMetric(metrics Model) {
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(metrics)
 
-	_, err := http.Post(c.url, "application/json", buf)
+	res, err := http.Post(c.url+"/metrics", "application/json", buf)
 
 	if err != nil {
-		log.Panic("Request error! ", err.Error())
+		log.Panicln("Request error! ", err.Error())
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if res.Status != "204" {
+		log.Panicln("Metric send not successful with status: " + res.Status + " Error req body: " + string(body))
 	}
 }

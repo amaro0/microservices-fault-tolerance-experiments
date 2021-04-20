@@ -2,6 +2,7 @@ package proxyserver
 
 import (
 	"encoding/json"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/proxyserver/config"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -26,7 +27,7 @@ type ProxyQuery struct {
 
 func RunServer() {
 	serverConfig := config.GetServerConfig()
-
+	metricsClient := metrics.NewClient(serverConfig.MetricsServerUrl)
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
@@ -72,7 +73,12 @@ func RunServer() {
 			return
 		}
 
-		//metricsData := data.Metrics{server: data.P}
+		metric := metrics.Model{
+			Server:    metrics.ProxyServer,
+			RequestId: query.RequestId,
+			WasError:  false,
+		}
+		metricsClient.SendMetric(metric)
 
 		c.JSON(200, gin.H{
 			"data": result.Data,
