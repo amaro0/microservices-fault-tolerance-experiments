@@ -32,7 +32,7 @@ func (c *client) SendMetric(metrics Model) {
 		log.Fatal(err)
 	}
 
-	if res.Status != "204" {
+	if res.StatusCode != 204 {
 		log.Panicln("Metric send not successful with status: " + res.Status + " Error req body: " + string(body))
 	}
 }
