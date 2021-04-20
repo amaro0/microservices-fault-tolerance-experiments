@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func RunExperiment(e Experiment) (string, error) {
+func runExperiment(e Experiment) (string, error) {
 	if e.ErrorRatio == 0 || rand.Intn(100) >= e.ErrorRatio {
 		return hash(e.StringToHash)
 	}
