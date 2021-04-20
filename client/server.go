@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/client/config"
@@ -15,7 +15,7 @@ var conf *config.ExperimentConfig
 // THIS should be rewritten to use two separate gorouteies requester and resolver
 // requester will issue requests in constant rate of X per second
 // resolver will handle results at constant rate
-func main() {
+func Run() {
 	conf = config.GetExperimentConfig()
 
 	tickerDone := make(chan bool)

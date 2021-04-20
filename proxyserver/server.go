@@ -1,4 +1,4 @@
-package main
+package proxyserver
 
 import (
 	"encoding/json"
@@ -24,7 +24,7 @@ type ProxyQuery struct {
 	RequestId string `form:"requestId" json:"requestId" binding:"required"`
 }
 
-func main() {
+func RunServer() {
 	serverConfig := config.GetServerConfig()
 
 	r := gin.Default()
@@ -71,6 +71,8 @@ func main() {
 			})
 			return
 		}
+
+		//metricsData := data.Metrics{server: data.P}
 
 		c.JSON(200, gin.H{
 			"data": result.Data,

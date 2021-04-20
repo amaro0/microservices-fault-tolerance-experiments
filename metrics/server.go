@@ -1,4 +1,4 @@
-package main
+package metrics
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func main() {
+func RunServer() {
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {

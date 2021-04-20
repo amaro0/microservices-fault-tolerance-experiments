@@ -1,4 +1,4 @@
-package main
+package finalserver
 
 import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/finalserver/config"
@@ -8,15 +8,6 @@ import (
 	"time"
 )
 
-//var (
-//	ExperimentErrors = struct {
-//		TimeoutError   string
-//		UnhandledError string
-//	}{
-//		TimeoutError:   "timeout",
-//		UnhandledError: "unhandled",
-//	}
-//)
 type ErrorType string
 
 const (
@@ -32,7 +23,7 @@ type Experiment struct {
 	TimeoutLengthInS int       `json:"timeoutLengthInS" json:"timeoutLengthInS"`
 }
 
-func main() {
+func RunServer() {
 	serverConfig := config.GetServerConfig()
 
 	failServerIfRequired(*serverConfig)
