@@ -20,3 +20,5 @@ note.md
 # infra
 .terraform
 infra
+
+*.csv
