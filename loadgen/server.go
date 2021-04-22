@@ -1,7 +1,7 @@
-package client
+package loadgen
 
 import (
-	"github.com/amaro0/microservices-fault-tolerance-experiments/client/config"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/loadgen/config"
 	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
