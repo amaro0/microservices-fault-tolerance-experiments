@@ -8,15 +8,15 @@ import (
 	"net/http"
 )
 
-type client struct {
+type Client struct {
 	url string
 }
 
-func NewClient(url string) *client {
-	return &client{url}
+func NewClient(url string) *Client {
+	return &Client{url}
 }
 
-func (c *client) SendMetric(metrics Model) {
+func (c *Client) SendMetric(metrics Model) {
 	buf := new(bytes.Buffer)
 	json.NewEncoder(buf).Encode(metrics)
 

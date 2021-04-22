@@ -18,7 +18,7 @@ func initDb() chan Model {
 	//defer file.Close()
 
 	w = csv.NewWriter(file)
-	if err := w.Write(getCSVHeader()); err != nil {
+	if err = w.Write(getCSVHeader()); err != nil {
 		log.Fatalln("error writing record to csv:", err)
 	}
 	w.Flush()
