@@ -18,6 +18,10 @@ func initDb() chan Model {
 	//defer file.Close()
 
 	w = csv.NewWriter(file)
+	if err := w.Write(getCSVHeader()); err != nil {
+		log.Fatalln("error writing record to csv:", err)
+	}
+	w.Flush()
 	metricsChan := make(chan Model, 1000)
 
 	go handleNewMetric(w, metricsChan)

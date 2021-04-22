@@ -1,5 +1,7 @@
 package metrics
 
+import "strconv"
+
 type ServerType string
 
 const (
@@ -13,22 +15,43 @@ type Model struct {
 	RequestId   string     `json:"requestId" binding:"required"`
 	WasError    bool       `json:"wasError"`
 	ErrorType   string     `json:"errorType"`
-	ErrorTime   int        `json:"errorTime"`
-	SuccessTime int        `json:"successTime"`
+	ErrorTime   float64    `json:"errorTime"`
+	SuccessTime float64    `json:"successTime"`
 }
 
 func (m *Model) prepareForCSV() []string {
-	var wasErrorInt int8
+	var (
+		wasErrorInt int
+		errorTime   = strconv.FormatFloat(m.ErrorTime, 'E', -1, 64)
+		successTime = strconv.FormatFloat(m.SuccessTime, 'E', -1, 64)
+	)
 	if m.WasError {
 		wasErrorInt = 1
+	}
+	if m.ErrorTime == 0 {
+		errorTime = "-"
+	}
+	if m.SuccessTime == 0 {
+		successTime = "-"
 	}
 
 	return []string{
 		string(m.Server),
 		m.RequestId,
-		string(wasErrorInt),
+		strconv.Itoa(wasErrorInt),
 		m.ErrorType,
-		string(m.ErrorTime),
-		string(m.SuccessTime),
+		errorTime,
+		successTime,
+	}
+}
+
+func getCSVHeader() []string {
+	return []string{
+		"Server",
+		"Request id",
+		"Was error",
+		"Error type",
+		"Error time",
+		"Success time",
 	}
 }
