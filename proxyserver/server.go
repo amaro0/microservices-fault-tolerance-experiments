@@ -27,6 +27,7 @@ func RunServer() {
 	})
 
 	r.GET("/proxy", func(c *gin.Context) {
+		startTime := time.Now()
 		var query finalclient.Data
 		if err := c.Bind(&query); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
@@ -42,15 +43,22 @@ func RunServer() {
 
 		result, err := finalServerClient.Request(query)
 		if err != nil {
-			metric.WasError = true
 			re, ok := err.(*finalclient.RequestError)
 			if ok {
 				metric.ErrorType = re.ErrorType
 			}
+			metric.WasError = true
+			metric.ErrorTime = int(time.Since(startTime) / time.Millisecond)
+			metricsClient.SendMetric(metric)
+
+			c.JSON(502, gin.H{
+				"error": Result{Error: err.Error()},
+			})
+			return
 		}
 
+		metric.SuccessTime = int(time.Since(startTime) / time.Millisecond)
 		metricsClient.SendMetric(metric)
-
 		c.JSON(200, gin.H{
 			"data": Result{Data: result},
 		})

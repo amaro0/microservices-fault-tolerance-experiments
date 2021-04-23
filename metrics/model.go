@@ -15,15 +15,15 @@ type Model struct {
 	RequestId   string     `json:"requestId" binding:"required"`
 	WasError    bool       `json:"wasError"`
 	ErrorType   string     `json:"errorType"`
-	ErrorTime   float64    `json:"errorTime"`
-	SuccessTime float64    `json:"successTime"`
+	ErrorTime   int        `json:"errorTime"`
+	SuccessTime int        `json:"successTime"`
 }
 
 func (m *Model) prepareForCSV() []string {
 	var (
 		wasErrorInt int
-		errorTime   = strconv.FormatFloat(m.ErrorTime, 'E', -1, 64)
-		successTime = strconv.FormatFloat(m.SuccessTime, 'E', -1, 64)
+		errorTime   = strconv.Itoa(m.ErrorTime)
+		successTime = strconv.Itoa(m.SuccessTime)
 	)
 	if m.WasError {
 		wasErrorInt = 1

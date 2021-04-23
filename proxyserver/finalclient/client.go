@@ -11,6 +11,10 @@ import (
 	"os"
 )
 
+type ApiResp struct {
+	Error string `json:"error"`
+	Data  Result `json:"data"`
+}
 type Result struct {
 	Hashed string `json:"hashed"`
 }
@@ -50,8 +54,8 @@ func (client *FinalClient) Request(data Data) (Result, error) {
 	}
 	defer resp.Body.Close()
 
-	result := Result{}
-	json.NewDecoder(resp.Body).Decode(&result)
+	apiResp := ApiResp{}
+	json.NewDecoder(resp.Body).Decode(&apiResp)
 
 	if resp.StatusCode == 500 {
 		log.Println(err)
@@ -63,7 +67,7 @@ func (client *FinalClient) Request(data Data) (Result, error) {
 		return Result{}, NewRequestError(ClientError, err)
 	}
 
-	return result, nil
+	return apiResp.Data, nil
 }
 
 func createExperimentUrl(serverConfig *config.ServerConfig, proxyQuery Data) (url.URL, error) {
