@@ -2,6 +2,8 @@ package loadgen
 
 import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/loadgen/config"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/proxyserver/finalclient"
 	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
@@ -11,9 +13,11 @@ import (
 )
 
 var conf *config.ExperimentConfig
+var metricsClient *metrics.Client
 
 func Run() {
 	conf = config.GetExperimentConfig()
+	metricsClient = metrics.NewClient(conf.MetricsServerUrl)
 
 	tickerDone := make(chan bool)
 	allRequestsDone := make(chan bool, conf.RequestBatch)
@@ -57,6 +61,13 @@ func Run() {
 }
 
 func request(done chan bool) {
+	startTime := time.Now()
+	requestId := uuid.NewString()
+	metric := metrics.Model{
+		Server:    metrics.LoadGen,
+		RequestId: requestId,
+		WasError:  false,
+	}
 	base, err := url.Parse(conf.ProxyServerUrl)
 	if err != nil {
 		log.Println("Url parsing error")
@@ -64,13 +75,28 @@ func request(done chan bool) {
 	}
 
 	query := url.Values{}
-	query.Add("requestId", uuid.NewString())
+	query.Add("requestId", requestId)
 	base.RawQuery = query.Encode()
 
 	resp, err := http.Get(base.String())
 
 	if err != nil {
 		log.Println("Request error! ", err.Error())
+		metric.WasError = true
+		metric.ErrorTime = int(time.Since(startTime) / time.Millisecond)
+		metric.ErrorType = finalclient.UnknownError
+		metricsClient.SendMetric(metric)
+
+		done <- true
+		return
+	}
+
+	if resp.StatusCode == 502 {
+		metric.WasError = true
+		metric.ErrorTime = int(time.Since(startTime) / time.Millisecond)
+		metric.ErrorType = finalclient.UnexpectedError
+		metricsClient.SendMetric(metric)
+
 		done <- true
 		return
 	}
@@ -85,6 +111,9 @@ func request(done chan bool) {
 	}
 
 	log.Print(string(body))
+
+	metric.SuccessTime = int(time.Since(startTime) / time.Millisecond)
+	metricsClient.SendMetric(metric)
 
 	done <- true
 }

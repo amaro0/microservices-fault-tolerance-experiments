@@ -10,6 +10,7 @@ type ExperimentConfig struct {
 	ConcurrentRequests int    `env:"CONCURRENT_REQUESTS" envDefault:"100" validate:"numeric,min=1"`
 	RequestBatch       int    `env:"REQUEST_BATCH" envDefault:"100" validate:"numeric,min=1"`
 	Rate               int    `env:"RATE" envDefault:"4" validate:="numeric,min=1"`
+	MetricsServerUrl   string `env:"METRICS_SERVER_URL" envDefault:"http://localhost:2000" validate:"url"`
 }
 
 var experimentConfigInstance *ExperimentConfig

@@ -5,9 +5,9 @@ import "strconv"
 type ServerType string
 
 const (
-	ProxyServer  ServerType = "proxy"
-	FinalServer  ServerType = "final"
-	ClientServer ServerType = "client"
+	ProxyServer ServerType = "proxy"
+	FinalServer ServerType = "final"
+	LoadGen     ServerType = "loadgen"
 )
 
 type Model struct {
