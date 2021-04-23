@@ -91,16 +91,6 @@ func request(done chan bool) {
 		return
 	}
 
-	if resp.StatusCode == 502 {
-		metric.WasError = true
-		metric.ErrorTime = int(time.Since(startTime) / time.Millisecond)
-		metric.ErrorType = finalclient.UnexpectedError
-		metricsClient.SendMetric(metric)
-
-		done <- true
-		return
-	}
-
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
@@ -110,7 +100,17 @@ func request(done chan bool) {
 		return
 	}
 
-	log.Print(string(body))
+	log.Println(string(body))
+
+	if resp.StatusCode == 502 {
+		metric.WasError = true
+		metric.ErrorTime = int(time.Since(startTime) / time.Millisecond)
+		metric.ErrorType = finalclient.UnexpectedError
+		metricsClient.SendMetric(metric)
+
+		done <- true
+		return
+	}
 
 	metric.SuccessTime = int(time.Since(startTime) / time.Millisecond)
 	metricsClient.SendMetric(metric)
