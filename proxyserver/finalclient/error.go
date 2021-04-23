@@ -3,20 +3,20 @@ package finalclient
 import "fmt"
 
 const (
-	TimeoutError = iota
-	UnexpectedError
-	ClientError
-	UnknownError
+	TimeoutError    = "timeout"
+	UnexpectedError = "unexpected"
+	ClientError     = "client"
+	UnknownError    = "unknown"
 )
 
 type RequestError struct {
-	ErrorCode int
+	ErrorType string
 	Err       error
 }
 
-func NewRequestError(errorCode int, error error) *RequestError {
+func NewRequestError(errorType string, error error) *RequestError {
 	return &RequestError{
-		ErrorCode: errorCode,
+		ErrorType: errorType,
 		Err:       error,
 	}
 }
