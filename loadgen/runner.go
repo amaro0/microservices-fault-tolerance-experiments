@@ -12,9 +12,6 @@ import (
 
 var conf *config.ExperimentConfig
 
-// THIS should be rewritten to use two separate gorouteies requester and resolver
-// requester will issue requests in constant rate of X per second
-// resolver will handle results at constant rate
 func Run() {
 	conf = config.GetExperimentConfig()
 
