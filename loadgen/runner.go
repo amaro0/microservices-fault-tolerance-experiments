@@ -4,6 +4,7 @@ import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/loadgen/config"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/proxyserver/finalclient"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/roundrobin"
 	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
@@ -14,10 +15,12 @@ import (
 
 var conf *config.ExperimentConfig
 var metricsClient *metrics.Client
+var roundRobinProxyServer *roundrobin.Selector
 
 func Run() {
 	conf = config.GetExperimentConfig()
 	metricsClient = metrics.NewClient(conf.MetricsServerUrl)
+	roundRobinProxyServer = createRRSelectorForProxyServer(conf)
 
 	tickerDone := make(chan bool)
 	allRequestsDone := make(chan bool, conf.RequestBatch)
@@ -68,7 +71,7 @@ func request(done chan bool) {
 		RequestId: requestId,
 		WasError:  false,
 	}
-	base, err := url.Parse(conf.ProxyServerUrl)
+	base, err := url.Parse(roundRobinProxyServer.Get())
 	if err != nil {
 		log.Println("Url parsing error")
 		return
@@ -116,4 +119,12 @@ func request(done chan bool) {
 	metricsClient.SendMetric(metric)
 
 	done <- true
+}
+
+func createRRSelectorForProxyServer(conf *config.ExperimentConfig) *roundrobin.Selector {
+	validUrls := roundrobin.GetUrlsWithNextPorts(
+		conf.ProxyServerUrl, conf.ProxyInstancesCount,
+	)
+
+	return roundrobin.NewSelector(validUrls)
 }

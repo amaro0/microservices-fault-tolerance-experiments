@@ -6,11 +6,12 @@ import (
 )
 
 type ExperimentConfig struct {
-	ProxyServerUrl     string `env:"FINAL_SERVER_URL" envDefault:"http://localhost:4000/proxy" validate:"url"`
-	ConcurrentRequests int    `env:"CONCURRENT_REQUESTS" envDefault:"100" validate:"numeric,min=1"`
-	RequestBatch       int    `env:"REQUEST_BATCH" envDefault:"100" validate:"numeric,min=1"`
-	Rate               int    `env:"RATE" envDefault:"4" validate:="numeric,min=1"`
-	MetricsServerUrl   string `env:"METRICS_SERVER_URL" envDefault:"http://localhost:2000" validate:"url"`
+	ProxyServerUrl      string `env:"PROXY_SERVER_URL" envDefault:"http://localhost:4000/proxy" validate:"url"`
+	ProxyInstancesCount int    `env:"PROXY_INSTANCES_COUNT" envDefault:"1" validate:"numeric,min=1"`
+	ConcurrentRequests  int    `env:"CONCURRENT_REQUESTS" envDefault:"100" validate:"numeric,min=1"`
+	RequestBatch        int    `env:"REQUEST_BATCH" envDefault:"100" validate:"numeric,min=1"`
+	Rate                int    `env:"RATE" envDefault:"4" validate:="numeric,min=1"`
+	MetricsServerUrl    string `env:"METRICS_SERVER_URL" envDefault:"http://localhost:2000" validate:"url"`
 }
 
 var experimentConfigInstance *ExperimentConfig
