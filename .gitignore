@@ -22,3 +22,5 @@ note.md
 infra
 
 *.csv
+
+.env
