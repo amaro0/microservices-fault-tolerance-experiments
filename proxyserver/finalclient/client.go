@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/proxyserver/config"
+	"github.com/amaro0/microservices-fault-tolerance-experiments/roundrobin"
 	"github.com/google/uuid"
 	"log"
 	"net/http"
@@ -24,21 +25,27 @@ type Data struct {
 }
 
 type FinalClient struct {
-	serverConfig  *config.ServerConfig
-	metricsClient *metrics.Client
+	serverConfig            *config.ServerConfig
+	metricsClient           *metrics.Client
+	roundRobinFinalSelector *roundrobin.Selector
 }
 
 func NewFinalClient(
 	serverConfig *config.ServerConfig, metricsClient *metrics.Client,
 ) *FinalClient {
+	validUrls := roundrobin.GetUrlsWithNextPorts(
+		serverConfig.FinalServerUrl, serverConfig.FinalInstancesCount,
+	)
+
 	return &FinalClient{
 		serverConfig,
 		metricsClient,
+		roundrobin.NewSelector(validUrls),
 	}
 }
 
 func (client *FinalClient) Request(data Data) (Result, error) {
-	url, err := createExperimentUrl(client.serverConfig, data)
+	url, err := createExperimentUrl(client.roundRobinFinalSelector, data)
 	if err != nil {
 		return Result{}, err
 	}
@@ -70,8 +77,8 @@ func (client *FinalClient) Request(data Data) (Result, error) {
 	return apiResp.Data, nil
 }
 
-func createExperimentUrl(serverConfig *config.ServerConfig, proxyQuery Data) (url.URL, error) {
-	base, err := url.Parse(serverConfig.FinalServerUrl)
+func createExperimentUrl(rrFinalServerSelector *roundrobin.Selector, proxyQuery Data) (url.URL, error) {
+	base, err := url.Parse(rrFinalServerSelector.Get())
 	if err != nil {
 		return *base, err
 	}
