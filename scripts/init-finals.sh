@@ -4,7 +4,6 @@ cd ..
 docker build -f Dockerfile.finalserver -t finalserver .
 
 for number in 0 1 2; do
-
   server="finalserver${number}"
   port="300${number}"
   echo "Initing ${server} on port: ${port}"
