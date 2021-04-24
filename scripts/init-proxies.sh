@@ -10,6 +10,12 @@ for number in 0 1 2; do
 
   docker stop $server
   docker rm $server
-  docker run --name $server -d -p $port:4000 proxyserver
+
+  if [ -f .env ]
+  then
+    docker run --name $server -d -p $port:4000 --env-file .env proxyserver
+  else
+    docker run --name $server -d -p $port:4000 proxyserver
+  fi
 
 done

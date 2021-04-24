@@ -1,11 +1,6 @@
 #!/bin/bash
 cd ..
 
-if [ -f .env ]
-then
-  export $(cat .env | sed 's/#.*//g' | xargs)
-fi
-
 docker build -f Dockerfile.finalserver -t finalserver .
 
 for number in 0 1 2; do
@@ -15,6 +10,12 @@ for number in 0 1 2; do
 
   docker stop $server
   docker rm $server
-  docker run --name $server -d -p $port:3000 finalserver
+
+  if [ -f .env ]
+  then
+    docker run --name $server -d -p $port:3000 --env-file .env finalserver
+  else
+    docker run --name $server -d -p $port:3000 finalserver
+  fi
 
 done
