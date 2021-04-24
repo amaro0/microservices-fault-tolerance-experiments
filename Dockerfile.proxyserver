@@ -5,23 +5,20 @@ ENV GO111MODULE=on \
     GOOS=linux \
     GOARCH=amd64
 
+RUN apk add --update iproute2
 WORKDIR /build
 
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-
 COPY . .
 
-RUN go build -o main .
+RUN go mod download
+
+RUN go build -o main proxy.go
 
 WORKDIR /dist
-
 RUN cp /build/main .
 
-FROM scratch
-
-COPY --from=builder /dist/main /
-
-# Command to run
-ENTRYPOINT ["/main"]
+EXPOSE 4000
+CMD ["/dist/main"]
