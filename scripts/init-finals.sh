@@ -1,6 +1,11 @@
 #!/bin/bash
 cd ..
 
+if [ -f .env ]
+then
+  export $(cat .env | sed 's/#.*//g' | xargs)
+fi
+
 docker build -f Dockerfile.finalserver -t finalserver .
 
 for number in 0 1 2; do
