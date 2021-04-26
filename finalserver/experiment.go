@@ -8,28 +8,28 @@ import (
 	"time"
 )
 
-func runExperiment(e Experiment, config *config.ServerConfig) (string, error) {
-	if e.ErrorRatio == 0 || rand.Intn(100) >= e.ErrorRatio {
-		return hash(e.StringToHash, config.HashSalt)
+func runExperiment(e Experiment, c *config.ServerConfig) (string, error) {
+	if c.ErrorRatio == 0 || rand.Intn(100) >= c.ErrorRatio {
+		return hash(e.StringToHash, c.HashSalt)
 	}
 
-	if e.ErrorType == TimeoutError {
-		timeoutErr := timeout(e)
+	if c.ErrorType == config.TimeoutError {
+		timeoutErr := timeout(c)
 
 		return "", timeoutErr
 	}
 
-	if e.ErrorType == UnhandledError {
-		hash(e.StringToHash, config.HashSalt-2)
+	if c.ErrorType == config.UnhandledError {
+		hash(e.StringToHash, c.HashSalt-2)
 
 		return "", errors.New("unhandled error: experiment successful unhandled error")
 	}
 
-	return hash(e.StringToHash, config.HashSalt)
+	return hash(e.StringToHash, c.HashSalt)
 }
 
-func timeout(e Experiment) error {
-	time.Sleep(time.Duration(e.TimeoutLengthInS) * time.Second)
+func timeout(c *config.ServerConfig) error {
+	time.Sleep(time.Duration(c.TimeoutLengthInS) * time.Second)
 
 	return errors.New("timeout: experiment successful timeout")
 }

@@ -5,12 +5,22 @@ import (
 	"log"
 )
 
+type ErrorType string
+
+const (
+	TimeoutError   ErrorType = "timeout"
+	UnhandledError ErrorType = "unhandled"
+)
+
 type ServerConfig struct {
-	Port                  string `env:"PORT" envDefault:"3000" validate:"numeric"`
-	GinMode               string `env:"GIN_MODE" envDefault:"debug" validate:"oneof=debug release"`
-	ShouldServerFail      bool   `env:"SHOULD_SERVER_FAIL" envDefault:"false"`
-	ShouldServerFailAfter int    `env:"SHOULD_SERVER_FAIL_AFTER" envDefault:"5"`
-	HashSalt              int    `env:"HASH_SALT" envDefault:"10"`
+	Port                  string    `env:"PORT" envDefault:"3000" validate:"numeric"`
+	GinMode               string    `env:"GIN_MODE" envDefault:"debug" validate:"oneof=debug release"`
+	ShouldServerFail      bool      `env:"SHOULD_SERVER_FAIL" envDefault:"false"`
+	ShouldServerFailAfter int       `env:"SHOULD_SERVER_FAIL_AFTER" envDefault:"5"`
+	HashSalt              int       `env:"HASH_SALT" envDefault:"10"`
+	ErrorRatio            int       `env:"ERROR_RATIO" envDefault:"25" validate:"min=0,max=100"`
+	ErrorType             ErrorType `env:"ERROR_TYPE" envDefault:"unhandled" validate:"oneof=timeout unhandled"`
+	TimeoutLengthInS      int       `env:"TIMEOUT_LENGTH" envDefault:"30" validate:"min=0"`
 }
 
 var serverConfigInstance *ServerConfig

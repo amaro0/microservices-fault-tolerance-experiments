@@ -8,19 +8,9 @@ import (
 	"time"
 )
 
-type ErrorType string
-
-const (
-	TimeoutError   ErrorType = "timeout"
-	UnhandledError ErrorType = "unhandled"
-)
-
 type Experiment struct {
-	StringToHash     string    `form:"stringToHash" json:"stringToHash" binding:"required"`
-	RequestId        string    `form:"requestId" json:"requestId" binding:"required"`
-	ErrorRatio       int       `json:"errorRatio" json:"errorRatio" validate:"min=0,max=100"`
-	ErrorType        ErrorType `json:"errorType" json:"errorType" validate:"oneof=timeout"'`
-	TimeoutLengthInS int       `json:"timeoutLengthInS" json:"timeoutLengthInS"`
+	StringToHash string `form:"stringToHash" json:"stringToHash" binding:"required"`
+	RequestId    string `form:"requestId" json:"requestId" binding:"required"`
 }
 
 func RunServer() {
@@ -37,7 +27,7 @@ func RunServer() {
 	})
 
 	r.GET("/experiment", func(c *gin.Context) {
-		query := Experiment{ErrorRatio: 50, ErrorType: UnhandledError, TimeoutLengthInS: 30}
+		query := Experiment{}
 
 		if err := c.Bind(&query); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
