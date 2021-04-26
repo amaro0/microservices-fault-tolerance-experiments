@@ -9,7 +9,7 @@ import (
 
 func runExperiment(e Experiment) (string, error) {
 	if e.ErrorRatio == 0 || rand.Intn(100) >= e.ErrorRatio {
-		return hash(e.StringToHash)
+		return hash(e)
 	}
 
 	if e.ErrorType == TimeoutError {
@@ -19,12 +19,12 @@ func runExperiment(e Experiment) (string, error) {
 	}
 
 	if e.ErrorType == UnhandledError {
-		hash(e.StringToHash)
+		hash(e)
 
 		return "", errors.New("unhandled error: experiment successful unhandled error")
 	}
 
-	return hash(e.StringToHash)
+	return hash(e)
 }
 
 func timeout(e Experiment) error {
@@ -33,11 +33,11 @@ func timeout(e Experiment) error {
 	return errors.New("timeout: experiment successful timeout")
 }
 
-func hash(s string) (hashed string, e error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(s), 10)
+func hash(e Experiment) (hashed string, err error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(e.StringToHash), 10)
 
 	if err != nil {
-		return s, err
+		return e.StringToHash, err
 	}
 
 	return string(bytes), nil

@@ -10,6 +10,7 @@ type ServerConfig struct {
 	GinMode               string `env:"GIN_MODE" envDefault:"debug" validate:"oneof=debug release"`
 	ShouldServerFail      bool   `env:"SHOULD_SERVER_FAIL" envDefault:"false"`
 	ShouldServerFailAfter int    `env:"SHOULD_SERVER_FAIL_AFTER" envDefault:"5"`
+	HashSalt              int    `env:"HASH_SALT" envDefault:"10"`
 }
 
 var serverConfigInstance *ServerConfig
