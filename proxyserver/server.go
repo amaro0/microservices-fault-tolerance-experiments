@@ -49,7 +49,7 @@ func RunServer() {
 			}
 			metric.WasError = true
 			metric.ErrorTime = int(time.Since(startTime) / time.Millisecond)
-			metricsClient.SendMetric(metric)
+			//metricsClient.SendMetric(metric)
 
 			c.JSON(502, gin.H{
 				"error": Result{Error: err.Error()},
@@ -58,7 +58,8 @@ func RunServer() {
 		}
 
 		metric.SuccessTime = int(time.Since(startTime) / time.Millisecond)
-		metricsClient.SendMetric(metric)
+		//metricsClient.SendMetric(metric)
+
 		c.JSON(200, gin.H{
 			"data": Result{Data: result},
 		})
