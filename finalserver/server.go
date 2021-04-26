@@ -44,7 +44,7 @@ func RunServer() {
 			return
 		}
 
-		hashed, err := runExperiment(query)
+		hashed, err := runExperiment(query, serverConfig)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
