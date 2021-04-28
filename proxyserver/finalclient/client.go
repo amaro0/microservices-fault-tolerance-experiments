@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 type ApiResp struct {
@@ -47,6 +48,7 @@ func NewFinalClient(
 
 func (client *FinalClient) RequestWithStrategy(data Data) (Result, error) {
 	if client.serverConfig.ProtectionIncluded(config.CircuitBreaker) {
+		// FailRatio probably will need some adjustment to even trigger some circuit breaks in random error generation
 		cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
 			Name: "Experiment circuit breaker",
 		})
@@ -56,6 +58,9 @@ func (client *FinalClient) RequestWithStrategy(data Data) (Result, error) {
 		})
 
 		if err != nil {
+			if err == gobreaker.ErrOpenState || err == gobreaker.ErrTooManyRequests {
+				log.Println("Circuit breaker early error")
+			}
 			return Result{}, err
 		}
 
@@ -71,8 +76,8 @@ func (client *FinalClient) request(data Data) (Result, error) {
 	}
 
 	httpClient := &http.Client{}
-	if client.serverConfig.ProtectionIncluded(TimeoutError) {
-		httpClient.Timeout = 5
+	if client.serverConfig.ProtectionIncluded(config.Timeout) {
+		httpClient.Timeout = 5 * time.Second
 	}
 
 	resp, err := httpClient.Get(url.String())

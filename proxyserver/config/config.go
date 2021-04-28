@@ -18,7 +18,7 @@ type ServerConfig struct {
 	FinalServerUrl       string                `env:"FINAL_SERVER_URL" envDefault:"http://localhost:3000/experiment" validate:"url"`
 	FinalInstancesCount  int                   `env:"FINAL_INSTANCES_COUNT" envDefault:"1" validate:"number,min=1"`
 	MetricsServerUrl     string                `env:"METRICS_SERVER_URL" envDefault:"http://localhost:2000" validate:"url"`
-	ProxyProtectionTypes []ProxyProtectionType `env:"PROXY_PROTECTION_TYPE" envDefault:""`
+	ProxyProtectionTypes []ProxyProtectionType `env:"PROXY_PROTECTION_TYPE" envSeparator:"," envDefault:""`
 }
 
 var serverConfigInstance *ServerConfig
