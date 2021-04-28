@@ -41,7 +41,7 @@ func RunServer() {
 			WasError:  false,
 		}
 
-		result, err := finalServerClient.Request(query)
+		result, err := finalServerClient.RequestWithStrategy(query)
 		if err != nil {
 			re, ok := err.(*finalclient.RequestError)
 			if ok {

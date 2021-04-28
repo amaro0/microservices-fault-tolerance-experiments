@@ -6,6 +6,7 @@ import (
 	"github.com/amaro0/microservices-fault-tolerance-experiments/proxyserver/config"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/roundrobin"
 	"github.com/google/uuid"
+	"github.com/sony/gobreaker"
 	"log"
 	"net/http"
 	"net/url"
@@ -44,7 +45,26 @@ func NewFinalClient(
 	}
 }
 
-func (client *FinalClient) Request(data Data) (Result, error) {
+func (client *FinalClient) RequestWithStrategy(data Data) (Result, error) {
+	if client.serverConfig.ProtectionIncluded(config.CircuitBreaker) {
+		cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name: "Experiment circuit breaker",
+		})
+
+		result, err := cb.Execute(func() (interface{}, error) {
+			return client.request(data)
+		})
+
+		if err != nil {
+			return Result{}, err
+		}
+
+		return result.(Result), nil
+	}
+	return client.request(data)
+}
+
+func (client *FinalClient) request(data Data) (Result, error) {
 	url, err := createExperimentUrl(client.roundRobinFinalSelector, data)
 	if err != nil {
 		return Result{}, err
