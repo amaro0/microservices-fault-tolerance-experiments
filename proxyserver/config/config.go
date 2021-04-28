@@ -36,3 +36,12 @@ func GetServerConfig() *ServerConfig {
 
 	return serverConfigInstance
 }
+
+func (c *ServerConfig) ProtectionIncluded(p ProxyProtectionType) bool {
+	for _, item := range serverConfigInstance.ProxyProtectionTypes {
+		if item == p {
+			return true
+		}
+	}
+	return false
+}

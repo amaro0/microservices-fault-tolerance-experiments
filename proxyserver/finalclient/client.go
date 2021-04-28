@@ -50,7 +50,12 @@ func (client *FinalClient) Request(data Data) (Result, error) {
 		return Result{}, err
 	}
 
-	resp, err := http.Get(url.String())
+	httpClient := &http.Client{}
+	if client.serverConfig.ProtectionIncluded(TimeoutError) {
+		httpClient.Timeout = 5
+	}
+
+	resp, err := httpClient.Get(url.String())
 	if err != nil {
 		log.Println(err)
 		if os.IsTimeout(err) {
