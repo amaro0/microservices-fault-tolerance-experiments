@@ -8,24 +8,32 @@ import (
 	"time"
 )
 
-func runExperiment(e Experiment, c *config.ServerConfig) (string, error) {
-	if c.ErrorRatio == 0 || rand.Intn(100) >= c.ErrorRatio {
+func runExperiment(e Experiment, c *config.ServerConfig, experimentStartTime time.Time) (string, error) {
+	if c.Randomized && (c.ErrorRatio > 0 && rand.Intn(100) < c.ErrorRatio) {
+		return "", forceError(e, c)
+	}
+
+	durationSinceStart := time.Now().Sub(experimentStartTime)
+	if !c.Randomized && c.ErrorRatio > 0 {
+		if durationSinceStart.Seconds() > float64(c.FailAfterTimeInS) {
+			return "", forceError(e, c)
+		}
 		return hash(e.StringToHash, c.HashSalt)
 	}
 
+	return hash(e.StringToHash, c.HashSalt)
+}
+
+func forceError(e Experiment, c *config.ServerConfig) error {
 	if c.ErrorType == config.TimeoutError {
 		timeoutErr := timeout(c)
 
-		return "", timeoutErr
+		return timeoutErr
 	}
 
-	if c.ErrorType == config.UnhandledError {
-		hash(e.StringToHash, c.HashSalt-2)
+	hash(e.StringToHash, c.HashSalt-2)
 
-		return "", errors.New("unhandled error: experiment successful unhandled error")
-	}
-
-	return hash(e.StringToHash, c.HashSalt)
+	return errors.New("unhandled error: experiment successful unhandled error")
 }
 
 func timeout(c *config.ServerConfig) error {

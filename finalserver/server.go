@@ -26,7 +26,11 @@ func RunServer() {
 		})
 	})
 
+	var experimetStartTime time.Time
 	r.GET("/experiment", func(c *gin.Context) {
+		if experimetStartTime.IsZero() {
+			experimetStartTime = time.Now()
+		}
 		query := Experiment{}
 
 		if err := c.Bind(&query); err != nil {
@@ -34,7 +38,7 @@ func RunServer() {
 			return
 		}
 
-		hashed, err := runExperiment(query, serverConfig)
+		hashed, err := runExperiment(query, serverConfig, experimetStartTime)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return

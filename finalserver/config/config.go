@@ -21,6 +21,8 @@ type ServerConfig struct {
 	ErrorRatio            int       `env:"ERROR_RATIO" envDefault:"25" validate:"min=0,max=100"`
 	ErrorType             ErrorType `env:"ERROR_TYPE" envDefault:"unhandled" validate:"oneof=timeout unhandled"`
 	TimeoutLengthInS      int       `env:"TIMEOUT_LENGTH" envDefault:"30" validate:"min=0"`
+	Randomized            bool      `env:"RANDOMIZED" envDefault:"true"`
+	FailAfterTimeInS      int       `env:"FAIL_AFTER_TIME" envDefault:"30" validate:"min=0"`
 }
 
 var serverConfigInstance *ServerConfig
