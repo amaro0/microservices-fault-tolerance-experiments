@@ -6,10 +6,14 @@ import (
 )
 
 type ErrorType string
+type Mode string
 
 const (
 	TimeoutError   ErrorType = "timeout"
 	UnhandledError ErrorType = "unhandled"
+	RandomizedMode Mode      = "randomizedMode"
+	FailAfterMode  Mode      = "failAfterMode"
+	SpikeMode      Mode      = "spikeMode"
 )
 
 type ServerConfig struct {
@@ -21,8 +25,9 @@ type ServerConfig struct {
 	ErrorRatio            int       `env:"ERROR_RATIO" envDefault:"25" validate:"min=0,max=100"`
 	ErrorType             ErrorType `env:"ERROR_TYPE" envDefault:"unhandled" validate:"oneof=timeout unhandled"`
 	TimeoutLengthInS      int       `env:"TIMEOUT_LENGTH" envDefault:"30" validate:"min=0"`
-	Randomized            bool      `env:"RANDOMIZED" envDefault:"true"`
-	FailAfterTimeInS      int       `env:"FAIL_AFTER_TIME" envDefault:"30" validate:"min=0"`
+	Mode                  Mode      `env:"MODE" envDefault:"randomized" validate:"oneof=randomized failAfterMode spikeMode"`
+	FailAfterTimeInS      int       `env:"FAIL_AFTER_TIME" envDefault:"2" validate:"min=0"`
+	FailDurationTimeInS   int       `env:"FAIL_DURATION_TIME" envDefault:"2" validate:"min=0"`
 }
 
 var serverConfigInstance *ServerConfig
@@ -39,4 +44,16 @@ func GetServerConfig() *ServerConfig {
 	}
 
 	return serverConfigInstance
+}
+
+func (c *ServerConfig) IsRandomizedMode() bool {
+	return c.Mode == RandomizedMode
+}
+
+func (c *ServerConfig) IsFailAfterMode() bool {
+	return c.Mode == RandomizedMode
+}
+
+func (c *ServerConfig) IsSpike() bool {
+	return c.Mode == SpikeMode
 }
