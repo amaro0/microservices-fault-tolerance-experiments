@@ -30,6 +30,7 @@ type FinalClient struct {
 	serverConfig            *config.ServerConfig
 	metricsClient           *metrics.Client
 	roundRobinFinalSelector *roundrobin.Selector
+	circuitBreaker          *gobreaker.CircuitBreaker
 }
 
 func NewFinalClient(
@@ -43,21 +44,24 @@ func NewFinalClient(
 		serverConfig,
 		metricsClient,
 		roundrobin.NewSelector(validUrls),
+		gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name: "Experiment circuit breaker",
+		}),
 	}
 }
 
 func (client *FinalClient) RequestWithStrategy(data Data) (Result, error) {
 	if client.serverConfig.ProtectionIncluded(config.CircuitBreaker) {
 		// FailRatio probably will need some adjustment to even trigger some circuit breaks in random error generation
-		cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
-			Name: "Experiment circuit breaker",
-		})
 
-		result, err := cb.Execute(func() (interface{}, error) {
+		result, err := client.circuitBreaker.Execute(func() (interface{}, error) {
 			return client.request(data)
 		})
 
+		log.Println("Circuit breaker state: ", client.circuitBreaker.State())
+
 		if err != nil {
+			log.Println("Err after circuit breaker: ", err)
 			if err == gobreaker.ErrOpenState || err == gobreaker.ErrTooManyRequests {
 				log.Println("Circuit breaker early error")
 			}
@@ -76,18 +80,23 @@ func (client *FinalClient) request(data Data) (Result, error) {
 	}
 
 	httpClient := &http.Client{}
-	if client.serverConfig.ProtectionIncluded(config.Timeout) {
+	if client.serverConfig.ProtectionIncluded(config.Timeout) || client.serverConfig.ProtectionIncluded(config.CircuitBreaker) {
+		log.Println("dodal timeout")
 		httpClient.Timeout = 5 * time.Second
 	}
 
 	resp, err := httpClient.Get(url.String())
 	if err != nil {
-		log.Println(err)
+		log.Println("err:  ", err)
 		if os.IsTimeout(err) {
-			return Result{}, NewRequestError(TimeoutError, err)
+			reqErr := NewRequestError(TimeoutError)
+			reqErr.AttachError(err)
+			return Result{}, reqErr
 		}
 
-		return Result{}, NewRequestError(UnknownError, err)
+		reqErr := NewRequestError(UnknownError)
+		reqErr.AttachError(err)
+		return Result{}, reqErr
 	}
 	defer resp.Body.Close()
 
@@ -95,13 +104,13 @@ func (client *FinalClient) request(data Data) (Result, error) {
 	json.NewDecoder(resp.Body).Decode(&apiResp)
 
 	if resp.StatusCode == 500 {
-		log.Println(err)
-		return Result{}, NewRequestError(UnexpectedError, err)
+		log.Println("500")
+		return Result{}, NewRequestError(UnexpectedError)
 
 	}
 	if resp.StatusCode >= 400 && resp.StatusCode < 500 {
-		log.Println(err)
-		return Result{}, NewRequestError(ClientError, err)
+		log.Println("Client err with status: ", resp.StatusCode)
+		return Result{}, NewRequestError(ClientError)
 	}
 
 	return apiResp.Data, nil

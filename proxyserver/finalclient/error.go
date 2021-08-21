@@ -14,11 +14,14 @@ type RequestError struct {
 	Err       error
 }
 
-func NewRequestError(errorType string, error error) *RequestError {
+func NewRequestError(errorType string) *RequestError {
 	return &RequestError{
 		ErrorType: errorType,
-		Err:       error,
 	}
+}
+
+func (r *RequestError) AttachError(e error) {
+	r.Err = e
 }
 
 func (r *RequestError) Error() string {
