@@ -1,11 +1,14 @@
 package finalclient
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/metrics"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/proxyserver/config"
 	"github.com/amaro0/microservices-fault-tolerance-experiments/roundrobin"
 	"github.com/google/uuid"
+	"github.com/slok/goresilience"
+	"github.com/slok/goresilience/bulkhead"
 	"github.com/sony/gobreaker"
 	"log"
 	"net/http"
@@ -31,7 +34,10 @@ type FinalClient struct {
 	metricsClient           *metrics.Client
 	roundRobinFinalSelector *roundrobin.Selector
 	circuitBreaker          *gobreaker.CircuitBreaker
+	bulkhead                goresilience.Runner
 }
+
+const timeoutDuration = 5 * time.Second
 
 func NewFinalClient(
 	serverConfig *config.ServerConfig, metricsClient *metrics.Client,
@@ -45,7 +51,15 @@ func NewFinalClient(
 		metricsClient,
 		roundrobin.NewSelector(validUrls),
 		gobreaker.NewCircuitBreaker(gobreaker.Settings{
-			Name: "Experiment circuit breaker",
+			Name:    "Experiment circuit breaker",
+			Timeout: 2 * time.Second,
+			ReadyToTrip: func(counts gobreaker.Counts) bool {
+				return counts.ConsecutiveFailures > 2
+			},
+		}),
+		bulkhead.New(bulkhead.Config{
+			Workers:     20,
+			MaxWaitTime: 30 * time.Millisecond,
 		}),
 	}
 }
@@ -70,6 +84,24 @@ func (client *FinalClient) RequestWithStrategy(data Data) (Result, error) {
 
 		return result.(Result), nil
 	}
+
+	if client.serverConfig.ProtectionIncluded(config.Bulkhead) {
+		reqResult := Result{}
+		var reqErr error
+
+		err := client.bulkhead.Run(context.TODO(), func(_ context.Context) error {
+			reqResult, reqErr = client.request(data)
+			return nil
+		})
+
+		if err != nil {
+			log.Println("Err after bulkhead: ", err)
+
+			return Result{}, err
+		}
+
+		return reqResult, nil
+	}
 	return client.request(data)
 }
 
@@ -81,8 +113,7 @@ func (client *FinalClient) request(data Data) (Result, error) {
 
 	httpClient := &http.Client{}
 	if client.serverConfig.ProtectionIncluded(config.Timeout) || client.serverConfig.ProtectionIncluded(config.CircuitBreaker) {
-		log.Println("dodal timeout")
-		httpClient.Timeout = 5 * time.Second
+		httpClient.Timeout = timeoutDuration
 	}
 
 	resp, err := httpClient.Get(url.String())

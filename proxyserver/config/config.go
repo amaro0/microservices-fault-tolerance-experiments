@@ -10,6 +10,7 @@ type ProxyProtectionType string
 const (
 	Timeout        ProxyProtectionType = "timeout"
 	CircuitBreaker ProxyProtectionType = "breaker"
+	Bulkhead       ProxyProtectionType = "bulkhead"
 )
 
 type ServerConfig struct {
