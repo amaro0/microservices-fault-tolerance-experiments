@@ -14,6 +14,7 @@ const (
 	RandomizedMode Mode      = "randomizedMode"
 	FailAfterMode  Mode      = "failAfterMode"
 	SpikeMode      Mode      = "spikeMode"
+	NoErrorMode    Mode      = "noErrorMode"
 )
 
 type ServerConfig struct {
@@ -25,7 +26,7 @@ type ServerConfig struct {
 	ErrorRatio            int       `env:"ERROR_RATIO" envDefault:"25" validate:"min=0,max=100"`
 	ErrorType             ErrorType `env:"ERROR_TYPE" envDefault:"unhandled" validate:"oneof=timeout unhandled"`
 	TimeoutLengthInS      int       `env:"TIMEOUT_LENGTH" envDefault:"30" validate:"min=0"`
-	Mode                  Mode      `env:"MODE" envDefault:"randomized" validate:"oneof=randomizedMode failAfterMode spikeMode"`
+	Mode                  Mode      `env:"MODE" envDefault:"noErrorMode" validate:"oneof=noErrorMode randomizedMode failAfterMode spikeMode"`
 	FailAfterTimeInS      int       `env:"FAIL_AFTER_TIME" envDefault:"2" validate:"min=0"`
 	FailDurationTimeInS   int       `env:"FAIL_DURATION_TIME" envDefault:"2" validate:"min=0"`
 }
