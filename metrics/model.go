@@ -29,10 +29,10 @@ func (m *Model) prepareForCSV() []string {
 		wasErrorInt = 1
 	}
 	if m.ErrorTime == 0 {
-		errorTime = "-"
+		errorTime = ""
 	}
 	if m.SuccessTime == 0 {
-		successTime = "-"
+		successTime = ""
 	}
 
 	return []string{

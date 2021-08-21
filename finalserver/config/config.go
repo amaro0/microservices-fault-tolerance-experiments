@@ -25,7 +25,7 @@ type ServerConfig struct {
 	ErrorRatio            int       `env:"ERROR_RATIO" envDefault:"25" validate:"min=0,max=100"`
 	ErrorType             ErrorType `env:"ERROR_TYPE" envDefault:"unhandled" validate:"oneof=timeout unhandled"`
 	TimeoutLengthInS      int       `env:"TIMEOUT_LENGTH" envDefault:"30" validate:"min=0"`
-	Mode                  Mode      `env:"MODE" envDefault:"randomized" validate:"oneof=randomized failAfterMode spikeMode"`
+	Mode                  Mode      `env:"MODE" envDefault:"randomized" validate:"oneof=randomizedMode failAfterMode spikeMode"`
 	FailAfterTimeInS      int       `env:"FAIL_AFTER_TIME" envDefault:"2" validate:"min=0"`
 	FailDurationTimeInS   int       `env:"FAIL_DURATION_TIME" envDefault:"2" validate:"min=0"`
 }
@@ -54,6 +54,6 @@ func (c *ServerConfig) IsFailAfterMode() bool {
 	return c.Mode == RandomizedMode
 }
 
-func (c *ServerConfig) IsSpike() bool {
+func (c *ServerConfig) IsSpikeMode() bool {
 	return c.Mode == SpikeMode
 }

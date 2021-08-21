@@ -24,7 +24,7 @@ func runExperiment(e Experiment, c *config.ServerConfig, experimentStartTime tim
 		return hash(e.StringToHash, c.HashSalt)
 	}
 
-	if c.IsSpike() && c.ErrorRatio > 0 {
+	if c.IsSpikeMode() && c.ErrorRatio > 0 {
 		if lastSpikeStatusChange.IsZero() {
 			isSpikeErroring = false
 			lastSpikeStatusChange = time.Now()
