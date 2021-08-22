@@ -96,8 +96,11 @@ func (client *FinalClient) RequestWithStrategy(data Data) (Result, error) {
 
 		if err != nil {
 			log.Println("Err after bulkhead: ", err)
-
 			return Result{}, err
+		}
+		if reqErr != nil {
+			log.Println("Err req: ", err)
+			return Result{}, reqErr
 		}
 
 		return reqResult, nil
